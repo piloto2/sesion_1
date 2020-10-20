@@ -1,0 +1,86 @@
+---
+title: "Solución ejercicios - Sesión 1"
+subtitle: "Capacitación en R y herramientas de productividad"
+author: "PE Servicios Compartidos para la Producción Estadística"
+output: pdf_document
+header-includes:
+- \usepackage[fontsize=11.8pt]{scrextend}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Solución ejercicios - Sesión 1
+
+Vamos a utilizar la base de datos `guaguas`, que conocimos en la primera sesión de este ciclo de capacitaciones. Recuerda que si ya la instalaste, con la función `install.packages("guaguas")`, no necesitas volver a hacerlo, solo deberás cargarla con `library(guaguas)`. 
+
+```{r, message = F}
+# install.packages("guaguas")
+library(guaguas)
+```
+
+Cargamos los datos en un objeto que podamos ver en el entorno de trabajo.
+
+```{r}
+data <- guaguas
+```
+
+## Ejercicio 1
+
+1- ¿Cuántas personas **con tu nombre** nacieron **el mismo año que tú**?
+
+Vamos a utilizar el nombre **Ignacio** para responder a la pregunta.En primer lugar exploramos los datos, para conocer nombres y tipos de variables.
+
+```{r, warning=F, message=F}
+str(data)
+```
+
+Para responder el ejercicio debemos usar las variables `anio` (numeric) y `nombre` (character), para construir un filtro que solo mantenga las observaciones que cumplen la condición. Adicionalmente, mantenemos solo algunas variables en el nuevo objeto `mi_nombre` que creamos (la variable `n` indica la cantidad de personas que nacieron en cada año según cada nombre).
+
+```{r, warning=F, message=F}
+mi_nombre = data[data$nombre == "Ignacio" & data$anio == 1985, c("nombre", "anio", "n")]
+mi_nombre
+```
+
+## Ejercicio 2
+
+¿Cuál fue el **nombre más usado** el año que tú naciste?
+
+Esto se puede resolver de diversas maneras. Mostraremos 2 formas, una creando objetos intermedios y otra resolviendo todo el ejercicio en solo una línea de código.
+
+Debemos cargar la librería `tidyverse`, que instalamos durante la primera sesión.
+
+```{r, message=F}
+library(tidyverse)
+mas_usado <- data[data$anio==1985, c("nombre", "anio", "n")]
+mas_usado <- arrange(mas_usado, desc(n))
+```
+
+O en una sola instrucción.
+
+```{r, message=F}
+mas_usado <- arrange(data[data$anio==1985, c("nombre", "anio", "n")])
+```
+
+En este caso al filtrar por año R entrega automáticamente ordenados los nombres según frecuencia, pero podría no ser así, o podríamos querer ordenarlos en sentido inverso.
+
+## Ejercicio 3 (**Bonus**)
+
+3. ¿Cuál es el nombre más usado en Chile en todos los tiempos?
+
+Este ejercicio es un *bonus* porque aún no contamos con todas las herramientas para realizar esta consulta a la base de datos. **Estos son contenidos de la Sesión 2**.
+
+```{r, warning=F, message=F}
+data %>% 
+  group_by(nombre) %>%
+  summarise(total = sum(n)) %>% 
+  arrange(desc(total)) %>% 
+  head()
+```
+
+Como podrían imaginar, el nombre más polular en Chile en todos los tiempos es "María".
+
+
+
+
